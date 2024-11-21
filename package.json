@@ -24,6 +24,7 @@
   "author": "chengchongzhen",
   "license": "MIT",
   "dependencies": {
+    "conf": "^13.0.1",
     "yargs": "^17.7.2"
   },
   "devDependencies": {

@@ -5,11 +5,10 @@ import { promises as fs } from "fs";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { generateDailyReport } from "./fetch.js";
-import ConfigManager from './config.js';
+import ConfigManager from "./config.js";
 
 const OUTPUT_FILE = "git_commits.txt";
 const OUTPUT_MD_FILE = "git_commits.md";
-
 
 function isGitRepository(path) {
   try {
@@ -25,13 +24,14 @@ function isGitRepository(path) {
 
 async function getGitCommits(
   timeFilter,
-  author = "chengchongzhen",
   outputFile = OUTPUT_FILE
 ) {
   if (!isGitRepository(process.cwd())) {
     console.error("错误: 当前目录不是一个git仓库");
     return;
   }
+
+  const author = ConfigManager.getAuthor();
 
   const cmd = `git log \
         ${timeFilter} \
@@ -78,12 +78,6 @@ yargs(hideBin(process.argv))
           description: "具体日期 (YYYY-MM-DD)",
           conflicts: ["days"],
         })
-        .option("author", {
-          alias: "a",
-          type: "string",
-          description: "作者名称",
-          default: "chengchongzhen",
-        })
         .option("output", {
           alias: "o",
           type: "string",
@@ -102,39 +96,44 @@ yargs(hideBin(process.argv))
         timeFilter = `--since="today.midnight"`;
       }
 
-      console.log(timeFilter);
-      getGitCommits(timeFilter, argv.author, argv.output);
+      getGitCommits(timeFilter, argv.output);
     }
   )
-  .command("set-api", "设置AI API地址", (yargs) => {
-    return yargs.option("apiUrl", {
-      alias: "u",
-      type: "string",
-      description: "AI API地址",
-    });
+  .command(
+    "set-author",
+    "设置作者",
+    (yargs) => {
+      return yargs.option("author", {
+        alias: "a",
+        type: "string",
+        description: "作者名称",
+      });
     },
     (argv) => {
-      setApiUrl(argv.apiUrl);
+      ConfigManager.saveAuthor(argv.author);
+    }
+  )
+  .command(
+    "set-api",
+    "设置AI API地址",
+    (yargs) => {
+      return yargs.option("apiUrl", {
+        alias: "u",
+        type: "string",
+        description: "AI API地址",
+      });
+    },
+    (argv) => {
+      ConfigManager.saveApiUrl(argv.apiUrl);
     }
   )
   .example("$0 -d 7", "获取最近7天的提交记录")
   .example("$0 -t", "获取当天提交记录")
-  .example('$0 -a "作者名称"', "获取指定作者的提交记录")
   .example('$0 -o "output.txt"', "指定输出文件名")
+  .example('$0 set-api -u "https://api.example.com/v1/chat/completions"', "设置AI API地址")
+  .example('$0 set-author -a "作者名称"', "设置作者")
   .help()
   .alias("h", "help")
   .alias("v", "version").argv;
 
-function setApiUrl(apiUrl) {
-  if (!apiUrl) {
-    console.error('请提供有效的 API 地址');
-    return;
-  }
 
-  try {
-    ConfigManager.saveApiUrl(apiUrl);
-    console.log('API 地址设置成功:', apiUrl);
-  } catch (error) {
-    console.error('设置 API 地址失败:', error);
-  }
-}
