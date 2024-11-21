@@ -1,6 +1,6 @@
 {
   "name": "@azhena/git-log",
-  "version": "1.0.3",
+  "version": "1.0.4-beta",
   "description": "获取git提交记录的命令行工具",
   "main": "./dist/git-log.cjs",
   "bin": {
