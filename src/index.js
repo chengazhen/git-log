@@ -5,9 +5,11 @@ import { promises as fs } from "fs";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { generateDailyReport } from "./fetch.js";
+import ConfigManager from './config.js';
 
 const OUTPUT_FILE = "git_commits.txt";
 const OUTPUT_MD_FILE = "git_commits.md";
+
 
 function isGitRepository(path) {
   try {
@@ -104,6 +106,17 @@ yargs(hideBin(process.argv))
       getGitCommits(timeFilter, argv.author, argv.output);
     }
   )
+  .command("set-api", "设置AI API地址", (yargs) => {
+    return yargs.option("apiUrl", {
+      alias: "u",
+      type: "string",
+      description: "AI API地址",
+    });
+    },
+    (argv) => {
+      setApiUrl(argv.apiUrl);
+    }
+  )
   .example("$0 -d 7", "获取最近7天的提交记录")
   .example("$0 -t", "获取当天提交记录")
   .example('$0 -a "作者名称"', "获取指定作者的提交记录")
@@ -111,3 +124,17 @@ yargs(hideBin(process.argv))
   .help()
   .alias("h", "help")
   .alias("v", "version").argv;
+
+function setApiUrl(apiUrl) {
+  if (!apiUrl) {
+    console.error('请提供有效的 API 地址');
+    return;
+  }
+
+  try {
+    ConfigManager.saveApiUrl(apiUrl);
+    console.log('API 地址设置成功:', apiUrl);
+  } catch (error) {
+    console.error('设置 API 地址失败:', error);
+  }
+}

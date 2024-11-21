@@ -4,8 +4,7 @@
   "description": "获取git提交记录的命令行工具",
   "main": "./dist/git-log.cjs",
   "bin": {
-    "glog": "./dist/git-log.cjs",
-    "git-log": "./git-log.js"
+    "glog": "./dist/git-log.cjs"
   },
   "type": "module",
   "scripts": {

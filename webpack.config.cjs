@@ -3,7 +3,7 @@ const ShebangPlugin = require('webpack-shebang-plugin');
 
 // 创建基础配置
 const baseConfig = {
-  entry: './index.js',
+  entry: './src/index.js',
   target: 'node',
   optimization: {
     minimize: false
