@@ -17,14 +17,31 @@ function isGitRepository(path) {
   }
 }
 
-async function getGitCommits(days = 7, author = 'chengchongzhen', outputFile = 'git_commits_today.txt') {
+async function getGitCommits(
+    days = null,
+    startDate = null,
+    endDate = null,
+    author = 'chengchongzhen',
+    outputFile = 'git_commits_today.txt'
+) {
     if (!isGitRepository(process.cwd())) {
         console.error('错误: 当前目录不是一个git仓库');
         return;
     }
 
+    let dateFilter = '';
+    if (days !== null) {
+        dateFilter = `--since="${days} days ago"`;
+    } else if (startDate && endDate) {
+        dateFilter = `--after="${startDate}" --before="${endDate}"`;
+    } else if (startDate) {
+        dateFilter = `--after="${startDate}"`;
+    } else if (endDate) {
+        dateFilter = `--before="${endDate}"`;
+    }
+
     const cmd = `git log \
-        --since="${days} days ago" \
+        ${dateFilter} \
         --author=${author} \
         --pretty=format:"%ad | %s" \
         --date=format:"%Y-%m-%d %H:%M:%S" \
@@ -47,13 +64,23 @@ async function getGitCommits(days = 7, author = 'chengchongzhen', outputFile = '
     }
 }
 
-// 由于yargs在ESM中的使用方式略有不同
+// 修改命令行参数配置
 const argv = yargs(hideBin(process.argv))
     .option('days', {
         alias: 'd',
         type: 'number',
         description: '要查询的天数',
-        default: 7
+        default: null
+    })
+    .option('start-date', {
+        alias: 's',
+        type: 'string',
+        description: '开始日期 (YYYY-MM-DD)',
+    })
+    .option('end-date', {
+        alias: 'e',
+        type: 'string',
+        description: '结束日期 (YYYY-MM-DD)',
     })
     .option('author', {
         alias: 'a',
@@ -70,4 +97,4 @@ const argv = yargs(hideBin(process.argv))
     .help()
     .parse();
 
-getGitCommits(argv.days, argv.author, argv.output);
+getGitCommits(argv.days, argv['start-date'], argv['end-date'], argv.author, argv.output);
