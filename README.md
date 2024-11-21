@@ -18,18 +18,16 @@ glog [选项]
 
 * `-t, --today`：获取当天提交记录
 * `-d, --days <number>`：要查询的天数（默认：7天）
-* `-a, --author <string>`：作者名称（默认：chengchongzhen）
 * `-o, --output <string>`：输出文件名（默认：git_commits_today.txt）
-* `-u, --apiUrl <string>`：AI API 地址（默认：https://free.zeroai.chat/v1/chat/completions）
 * `--help`：显示帮助信息
 
+#### 设置选项（作者必须设置，内置api体验非常不佳）
+
+* `set-api -u <string>`：设置 AI API 地址
+* `set-author -a <string>`：设置作者
+
+
 ### 示例
-
-设置 AI API 地址：
-
-```bash
-glog -u "https://api.example.com/v1/chat/completions"
-```
 
 获取当天提交记录：
 
