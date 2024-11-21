@@ -4,12 +4,14 @@
   "description": "获取git提交记录的命令行工具",
   "main": "./dist/git-log.cjs",
   "bin": {
-    "glog": "./dist/git-log.cjs"
+    "glog": "./dist/git-log.cjs",
+    "git-log": "./git-log.js"
   },
   "type": "module",
   "scripts": {
     "build": "webpack --mode production",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "node index.js -t"
   },
   "keywords": [
     "git",
