@@ -1,6 +1,6 @@
 {
   "name": "@azhena/git-log",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "获取git提交记录的命令行工具",
   "main": "./dist/git-log.cjs",
   "bin": {
@@ -16,6 +16,10 @@
     "log",
     "cli"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azhena/git-log.git"
+  },
   "author": "chengchongzhen",
   "license": "MIT",
   "dependencies": {

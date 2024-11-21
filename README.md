@@ -55,4 +55,3 @@ glog -o "my_commits.txt"
 ## 许可证
 
 MIT
-```
