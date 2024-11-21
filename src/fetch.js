@@ -1,7 +1,7 @@
 import ConfigManager from './config.js';
 
 // 设置默认的 AI API 地址
-const DEFAULT_AI_API_URL = "http://49.234.181.38:8181/v1/chat/completions";
+const DEFAULT_AI_API_URL = "https://free.zeroai.chat/v1/chat/completions";
 
 export async function generateDailyReport(commits) {
   // 预设
