@@ -4,8 +4,10 @@ import { exec, execSync } from "child_process";
 import { promises as fs } from "fs";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import { generateDailyReport } from "./fetch.js";
 
 const OUTPUT_FILE = "git_commits.txt";
+const OUTPUT_MD_FILE = "git_commits.md";
 
 function isGitRepository(path) {
   try {
@@ -47,6 +49,10 @@ async function getGitCommits(
 
     await fs.writeFile(outputFile, stdout, "utf-8");
     console.log(`提交记录已保存到 ${outputFile}`);
+    console.log("开始生成日报...");
+    const report = await generateDailyReport(stdout);
+    await fs.writeFile(OUTPUT_MD_FILE, report, "utf-8");
+    console.log(`日报已保存到 ${OUTPUT_MD_FILE}`);
   } catch (error) {
     console.error("发生错误:", error);
   }
