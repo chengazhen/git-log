@@ -1,5 +1,5 @@
 {
-  "name": "git-log",
+  "name": "@azhena/git-log",
   "version": "1.0.0",
   "description": "获取git提交记录的命令行工具",
   "main": "./dist/git-log.cjs",

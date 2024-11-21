@@ -6,7 +6,7 @@
 ## 安装
 
 ```bash
-npm install -g git-log
+npm install -g npm i @azhena/git-log
 ```
 
 ## 使用方法
