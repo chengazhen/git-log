@@ -1,9 +1,14 @@
 import ConfigManager from './config.js';
 
-// 设置默认的 AI API 地址
-const DEFAULT_AI_API_URL = "https://free.zeroai.chat/v1/chat/completions";
-
 export async function generateDailyReport(commits) {
+  // 检查必要的环境变量
+  const apiUrl = ConfigManager.getApiUrl();
+  const apiKey = ConfigManager.getApiKey();
+
+  if (!apiUrl || !apiKey) {
+    return "API URL 或 API Key 未配置，请使用命令配置：git-log config set-api-url <YOUR_API_URL> 和 git-log config set-api-key <YOUR_API_KEY>";
+  }
+
   // 预设
   const systemMessage = {
     role: "system",
@@ -25,11 +30,8 @@ export async function generateDailyReport(commits) {
         + xxxx
         + xxxx
       ---
-      `,
+      `
   };
-
-  // 优先使用参数中的 apiUrl，其次使用配置文件中的地址，最后使用默认地址
-  const apiUrl = ConfigManager.getApiUrl() || DEFAULT_AI_API_URL;
 
   try {
     const response = await fetch(apiUrl, {
@@ -40,11 +42,18 @@ export async function generateDailyReport(commits) {
       }),
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
       },
     });
 
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`API 请求失败: ${response.status} ${response.statusText}\n${errorData.error?.message || ''}`);
+    }
+
     const data = await response.json();
     return data.choices[0].message.content;
+    
   } catch (error) {
     console.error("生成日报失败:", error);
     throw error;

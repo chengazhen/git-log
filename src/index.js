@@ -32,7 +32,7 @@ async function getGitCommits(
   }
 
   const author = ConfigManager.getAuthor();
-
+  console.log(author);
   const cmd = `git log \
         ${timeFilter} \
         --author=${author} \
@@ -41,6 +41,8 @@ async function getGitCommits(
         --all \
         --no-merges`;
 
+  console.log(cmd);
+
   try {
     const { stdout, stderr } = await new Promise((resolve, reject) => {
       exec(cmd, { maxBuffer: 1024 * 1024 * 10 }, (error, stdout, stderr) => {
@@ -48,6 +50,7 @@ async function getGitCommits(
         resolve({ stdout, stderr });
       });
     });
+
 
     await fs.writeFile(outputFile, stdout, "utf-8");
     console.log(`提交记录已保存到 ${outputFile}`);
@@ -99,41 +102,77 @@ yargs(hideBin(process.argv))
       getGitCommits(timeFilter, argv.output);
     }
   )
-  .command(
-    "set-author",
-    "设置作者",
-    (yargs) => {
-      return yargs.option("author", {
-        alias: "a",
-        type: "string",
-        description: "作者名称",
-      });
-    },
-    (argv) => {
-      ConfigManager.saveAuthor(argv.author);
-    }
-  )
-  .command(
-    "set-api",
-    "设置AI API地址",
-    (yargs) => {
-      return yargs.option("apiUrl", {
-        alias: "u",
-        type: "string",
-        description: "AI API地址",
-      });
-    },
-    (argv) => {
-      ConfigManager.saveApiUrl(argv.apiUrl);
-    }
-  )
+  .command("config", "配置管理", (yargs) => {
+    return yargs
+      .command(
+        "list",
+        "查看当前配置",
+        () => {},
+        () => {
+          const author = ConfigManager.getAuthor();
+          const apiUrl = ConfigManager.getApiUrl();
+          const apiKey = ConfigManager.getApiKey();
+          
+          console.log("\n当前配置信息：");
+          console.log("----------------------------------------");
+          console.log(`作者名称: ${author || '未设置'}`);
+          console.log(`API 地址: ${apiUrl || '未设置'}`);
+          console.log(`API Key: ${apiKey ? '已设置' : '未设置'}`);
+          console.log("----------------------------------------\n");
+        }
+      )
+      .command(
+        "set-author <author>",
+        "设置作者名称",
+        (yargs) => {
+          return yargs.positional("author", {
+            describe: "作者名称",
+            type: "string",
+            demandOption: true
+          });
+        },
+        (argv) => {
+          ConfigManager.saveAuthor(argv.author);
+        }
+      )
+      .command(
+        "set-api-url <url>",
+        "设置 AI API 地址",
+        (yargs) => {
+          return yargs.positional("url", {
+            describe: "API 地址，例如：https://api.openai.com/v1/chat/completions",
+            type: "string",
+            demandOption: true
+          });
+        },
+        (argv) => {
+          ConfigManager.saveApiUrl(argv.url);
+        }
+      )
+      .command(
+        "set-api-key <key>",
+        "设置 AI API Key",
+        (yargs) => {
+          return yargs.positional("key", {
+            describe: "API Key，格式如：sk-xxxxxxxxxxxxxxxxxxxxxxxx",
+            type: "string",
+            demandOption: true
+          });
+        },
+        (argv) => {
+          ConfigManager.saveApiKey(argv.key);
+        }
+      )
+      .demandCommand(1, "请指定要执行的配置命令")
+      .example("$0 config list", "查看当前配置")
+      .example("$0 config set-author 'John Doe'", "设置作者名称")
+      .example("$0 config set-api-url 'https://api.example.com/v1/chat/completions'", "设置 AI API 地址")
+      .example("$0 config set-api-key 'sk-xxxxxx'", "设置 AI API Key");
+  })
   .example("$0 -d 7", "获取最近7天的提交记录")
   .example("$0 -t", "获取当天提交记录")
   .example('$0 -o "output.txt"', "指定输出文件名")
-  .example('$0 set-api -u "https://api.example.com/v1/chat/completions"', "设置AI API地址")
-  .example('$0 set-author -a "作者名称"', "设置作者")
   .help()
   .alias("h", "help")
   .alias("v", "version").argv;
-
 
