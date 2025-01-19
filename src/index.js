@@ -32,7 +32,6 @@ async function getGitCommits(
   }
 
   const author = ConfigManager.getAuthor();
-  console.log(author);
   const cmd = `git log \
         ${timeFilter} \
         --author=${author} \
@@ -41,7 +40,6 @@ async function getGitCommits(
         --all \
         --no-merges`;
 
-  console.log(cmd);
 
   try {
     const { stdout, stderr } = await new Promise((resolve, reject) => {
